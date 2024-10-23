@@ -14,6 +14,8 @@ module.exports = (app) => {
     // Ruta para eliminar un dato del experimento
     router.delete('/:id_dato', datosController.eliminarDato);
 
+    router.post('/upload', datosController.uploadFile);
+
 
     app.use('/api/datos', router);
 };

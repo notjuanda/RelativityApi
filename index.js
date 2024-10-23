@@ -1,7 +1,10 @@
 const express = require('express')
 var cors = require('cors')
 const bodyParser = require('body-parser')
+const fileUpload = require('express-fileupload')
 const app = express()
+
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -15,6 +18,9 @@ var corsOptions = {
 app.use(cors(corsOptions))
 
 app.use(express.static('public'));
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB de límite
+}));
 
 const db = require("./models");
 db.sequelize.sync({
