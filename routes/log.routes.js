@@ -5,5 +5,5 @@ module.exports = (app) => {
     // Ruta para obtener todos los logs
     router.get('/', logController.obtenerLogs);
 
-    app.use('/logs', router);
+    app.use('/api/logs', router);
 };

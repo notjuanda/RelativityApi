@@ -8,5 +8,9 @@ module.exports = (app) => {
     // Ruta para obtener todos los datos de un experimento específico
     router.get('/:id_experimento', datosController.obtenerDatosPorExperimento);
 
+    // Ruta para editar un dato del experimento
+    router.put('/:id_dato', datosController.editarDato);
+
+
     app.use('/api/datos', router);
 };

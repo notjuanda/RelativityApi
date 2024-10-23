@@ -47,3 +47,24 @@ exports.obtenerDatosPorExperimento = async (req, res) => {
         res.status(500).json({ msg: 'Error al obtener los datos' });
     }
 };
+
+// Editar un dato del experimento
+exports.editarDato = async (req, res) => {
+    try {
+        const { id_dato } = req.params;
+        const { x, y } = req.body;
+
+        const dato = await DatosExperimento.findByPk(id_dato);
+        if (!dato) {
+        return res.status(404).json({ msg: 'Dato no encontrado.' });
+        }
+        
+        dato.x = x;
+        dato.y = y;
+        await dato.save();
+
+        res.json({ msg: 'Dato actualizado con éxito.', dato });
+    } catch (error) {
+        res.status(500).json({ msg: 'Error al actualizar el dato.', error });
+    }
+};
