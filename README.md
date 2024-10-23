@@ -48,6 +48,7 @@ cd RelativityAPI
 yarn install
 # o
 npm install
+```
 
 ## 🚀 **Ejecución del Proyecto**
 
@@ -65,6 +66,8 @@ CREATE DATABASE relativityapi;
 -- Crear las tablas
 -- (Ver estructura completa en /db/schema.sql)
 
+```
+
 3. Asegúrate de configurar tus credenciales en el archivo `config/db.config.js`:
 
 ```javascript
@@ -77,6 +80,7 @@ module.exports = {
     DIALECT: 'postgres',
     PORT: 5432
 };
+```
 
 ### **Iniciar el Servidor**
 
@@ -86,6 +90,7 @@ Ejecuta el siguiente comando para iniciar el servidor en modo desarrollo:
 ```bash
 npx nodemon index.js
 La API estará disponible en: [http://localhost:3000](http://localhost:3000)
+```
 
 ---
 
@@ -153,6 +158,8 @@ RelativityAPI/
 ├── config/             # Configuraciones de la BD y del entorno
 ├── db/                 # Scripts SQL para la base de datos
 └── index.js            # Punto de entrada principal del servidor
+```
+
 ---
 
 ## 📂 **Contribuciones**
@@ -168,13 +175,6 @@ RelativityAPI/
 
 Este proyecto está licenciado bajo la **MIT License**.  
 Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-## 🤝 **Colaboradores**
-
-- **Juan Pérez** – Desarrollador Backend  
-- **Nombre del Colaborador 2** – Desarrollador Frontend  
 
 ---
 
