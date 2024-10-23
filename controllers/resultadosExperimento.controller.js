@@ -2,14 +2,12 @@ const db = require('../models');
 const DatosExperimento = db.DatosExperimento;
 const Log = db.Log;
 
-// Función auxiliar para obtener los datos
+// Función auxiliar para obtener los datos con validación adecuada
 async function obtenerDatos(id_experimento) {
     const datos = await DatosExperimento.findAll({ where: { id_experimento } });
-    if (datos.length === 0) {
-        throw new Error('No se encontraron datos para este experimento.');
-    }
     return datos;
 }
+
 
 // Calcular Sxx manualmente
 exports.obtenerSxx = async (req, res) => {
@@ -147,7 +145,14 @@ exports.obtenerUnoMenosR2 = async (req, res) => {
 exports.obtenerTodosLosResultados = async (req, res) => {
     try {
         const datos = await obtenerDatos(req.params.id_experimento);
-        
+
+        if (datos.length === 0) {
+            return res.status(200).json({
+                msg: 'Este experimento no tiene datos aún.',
+                resultados: null
+            });
+        }
+
         let Sxx = 0, Syy = 0, Sxy = 0;
         for (const { x, y } of datos) {
             Sxx += x * x;
@@ -176,6 +181,7 @@ exports.obtenerTodosLosResultados = async (req, res) => {
             descripcion: `Se calcularon todos los resultados para el experimento ${req.params.id_experimento}.`
         });
     } catch (error) {
-        res.status(500).json({ msg: error.message });
+        console.error('Error al obtener resultados:', error);
+        res.status(500).json({ msg: 'Error al obtener los resultados del experimento.' });
     }
 };

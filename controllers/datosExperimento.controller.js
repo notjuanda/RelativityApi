@@ -41,22 +41,23 @@ exports.guardarDatos = async (req, res) => {
 
 // Obtener todos los datos de un experimento
 exports.obtenerDatosPorExperimento = async (req, res) => {
-    const { id_experimento } = req.params;
-
-    try {
-        const datos = await DatosExperimento.findAll({ 
+        const { id_experimento } = req.params;
+    
+        try {
+        const datos = await DatosExperimento.findAll({
             where: { id_experimento },
-            order: [['id_dato', 'ASC']]
+            order: [['id_dato', 'ASC']],
         });
-
+    
         if (datos.length === 0) {
-            return res.status(404).json({ msg: 'No se encontraron datos para este experimento.' });
+            return res.status(200).json({ msg: 'Este experimento no tiene datos.', datos: [] });
         }
-
-        res.json(datos);
-    } catch (error) {
-        res.status(500).json({ msg: 'Error al obtener los datos' });
-    }
+    
+        res.status(200).json(datos);
+        } catch (error) {
+        console.error('Error al obtener los datos:', error);
+        res.status(500).json({ msg: 'Error al obtener los datos del experimento.' });
+        }
 };
 
 // Editar un dato del experimento
