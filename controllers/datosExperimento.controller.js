@@ -58,7 +58,7 @@ exports.editarDato = async (req, res) => {
         if (!dato) {
         return res.status(404).json({ msg: 'Dato no encontrado.' });
         }
-        
+
         dato.x = x;
         dato.y = y;
         await dato.save();
@@ -66,5 +66,21 @@ exports.editarDato = async (req, res) => {
         res.json({ msg: 'Dato actualizado con éxito.', dato });
     } catch (error) {
         res.status(500).json({ msg: 'Error al actualizar el dato.', error });
+    }
+};
+
+// Eliminar un dato por ID
+exports.eliminarDato = async (req, res) => {
+    const { id_dato } = req.params;
+    try {
+        const dato = await DatosExperimento.findByPk(id_dato);
+        if (!dato) {
+            return res.status(404).json({ msg: 'Dato no encontrado.' });
+        }
+
+        await dato.destroy();
+        res.status(200).json({ msg: 'Dato eliminado correctamente.' });
+    } catch (error) {
+        res.status(500).json({ msg: 'Error al eliminar el dato.', error: error.message });
     }
 };
