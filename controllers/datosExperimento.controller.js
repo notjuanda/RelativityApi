@@ -2,6 +2,12 @@ const db = require('../models');
 const DatosExperimento = db.DatosExperimento;
 const Log = db.Log; // Para registrar logs
 const path = require('path');
+const fs = require('fs');
+const csvParser = require('csv-parser');
+const xlsx = require('xlsx');
+const Experimento = db.Experimento;
+
+
 
 // Validar si un valor es un número válido o asignar 0 por defecto
 const validarNumero = (valor) => (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor));
@@ -120,7 +126,7 @@ exports.uploadFile = async (req, res) => {
             return res.status(400).json({ msg: 'Solo se permiten archivos CSV y XLSX.' });
         }
 
-        // Ruta donde se guardará el archivo (public/uploads)
+        // Ruta donde se guardará el archivo
         const uploadPath = path.join(__dirname, '..', 'public', 'uploads', archivo.name);
 
         // Mover el archivo a la carpeta 'public/uploads'
@@ -134,20 +140,84 @@ exports.uploadFile = async (req, res) => {
                 return res.status(500).json({ msg: 'Error al guardar el archivo.' });
             }
 
-            // Registrar log de la subida del archivo exitosa
-            await Log.create({
-                accion: 'Subida de archivo',
-                descripcion: `Se subió el archivo ${archivo.name} exitosamente.`
+            // Procesar el archivo y extraer los datos
+            let datos;
+            if (ext === '.csv') {
+                datos = await procesarCSV(uploadPath);
+            } else if (ext === '.xlsx') {
+                datos = await procesarXLSX(uploadPath);
+            }
+
+            // Crear el experimento en la base de datos
+            const experimento = await Experimento.create({
+                nombre: `Experimento - ${archivo.name}`,
+                descripcion: `Datos importados desde ${archivo.name}`
             });
 
-            res.status(200).json({ msg: 'Archivo subido exitosamente.', file: archivo.name });
+            // Guardar los datos del experimento en la base de datos
+            for (const dato of datos) {
+                await DatosExperimento.create({
+                    id_experimento: experimento.id_experimento,
+                    x: dato.x,
+                    y: dato.y
+                });
+            }
+
+            // Registrar log de la creación del experimento y subida del archivo
+            await Log.create({
+                id_experimento: experimento.id_experimento,
+                accion: 'Creación de experimento y subida de archivo',
+                descripcion: `Se creó el experimento ${experimento.nombre} con datos del archivo ${archivo.name}.`
+            });
+
+            res.status(200).json({
+                msg: 'Archivo subido y procesado correctamente. Experimento creado.',
+                experimento,
+                datos
+            });
         });
     } catch (error) {
-        console.error('Error al subir el archivo:', error.message);
+        console.error('Error al subir y procesar el archivo:', error.message);
         await Log.create({
             accion: 'Error',
             descripcion: `Error inesperado: ${error.message}`
         });
-        res.status(500).json({ msg: 'Error al subir el archivo.' });
+        res.status(500).json({ msg: 'Error al subir y procesar el archivo.' });
     }
+};
+
+// Procesar archivo CSV: Extraer columnas 'x' e 'y'
+const procesarCSV = (rutaArchivo) => {
+    return new Promise((resolve, reject) => {
+        const resultados = [];
+        fs.createReadStream(rutaArchivo)
+            .pipe(csvParser())
+            .on('data', (data) => {
+                if (data.x !== undefined && data.y !== undefined) {
+                    resultados.push({ x: parseFloat(data.x), y: parseFloat(data.y) });
+                }
+            })
+            .on('end', () => resolve(resultados))
+            .on('error', (error) => reject(error));
+    });
+};
+
+// Procesar archivo XLSX: Extraer columnas 'x' e 'y'
+const procesarXLSX = (rutaArchivo) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const workbook = xlsx.readFile(rutaArchivo);
+            const hoja = workbook.Sheets[workbook.SheetNames[0]]; // Leer la primera hoja
+            const jsonData = xlsx.utils.sheet_to_json(hoja);
+
+            const resultados = jsonData.map((row) => ({
+                x: parseFloat(row.x),
+                y: parseFloat(row.y),
+            })).filter(row => !isNaN(row.x) && !isNaN(row.y)); // Filtrar valores inválidos
+
+            resolve(resultados);
+        } catch (error) {
+            reject(error);
+        }
+    });
 };
