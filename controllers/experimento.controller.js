@@ -54,6 +54,33 @@ exports.obtenerPorID = async (req, res) => {
     }
 };
 
+// Editar un experimento por ID
+exports.editarExperimento = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion } = req.body;
+
+    try {
+        const experimento = await Experimento.findByPk(id);
+        if (!experimento) {
+            return res.status(404).json({ msg: 'Experimento no encontrado.' });
+        }
+
+        experimento.nombre = nombre || experimento.nombre;
+        experimento.descripcion = descripcion || experimento.descripcion;
+        await experimento.save();
+
+        await Log.create({
+            id_experimento: experimento.id_experimento,
+            accion: 'Edición de experimento',
+            descripcion: `Se editó el experimento ${id} con nombre ${nombre}.`
+        });
+
+        res.json({ msg: 'Experimento actualizado con éxito.', experimento });
+    } catch (error) {
+        res.status(500).json({ msg: 'Error al actualizar el experimento.' });
+    }
+};
+
 // Eliminar un experimento por ID
 exports.eliminarExperimento = async (req, res) => {
     const { id } = req.params;

@@ -14,5 +14,8 @@ module.exports = (app) => {
     // Eliminar un experimento por ID
     router.delete('/:id', experimentoController.eliminarExperimento);
 
+    // Editar un experimento por ID
+    router.put('/:id', experimentoController.editarExperimento);
+
     app.use('/api/experimentos', router);
 };
