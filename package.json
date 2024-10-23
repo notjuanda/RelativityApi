@@ -1,0 +1,31 @@
+{
+  "name": "relativityapi",
+  "version": "1.0.0",
+  "description": "RelativityAPI es un backend flexible desarrollado con Node.js y PostgreSQL, diseñado para gestionar experimentos y realizar análisis estadísticos. Su objetivo es calcular correlaciones entre datos, permitiendo almacenar múltiples conjuntos y visualizar resultados dinámicamente.",
+  "main": "index.js",
+  "scripts": {
+    "test": "dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notjuanda/RelativityApi.git"
+  },
+  "author": "Juan David Viveros Chavez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/notjuanda/RelativityApi/issues"
+  },
+  "homepage": "https://github.com/notjuanda/RelativityApi#readme",
+  "dependencies": {
+    "@eslint/js": "^9.13.0",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "eslint": "^9.13.0",
+    "express": "^4.21.1",
+    "globals": "^15.11.0",
+    "nodemon": "^3.1.7",
+    "path": "^0.12.7",
+    "pg": "^8.13.0",
+    "sha1": "^1.1.1"
+  }
+}
